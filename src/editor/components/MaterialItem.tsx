@@ -7,6 +7,7 @@ export interface MaterialItemProps {
 export function MaterialItem(props: MaterialItemProps) {
   const { name } = props;
 
+  // 使用useDrag
   const [, drag] = useDrag({
     type: name,
     item: {
