@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { useComponentConfigStore } from "../stores/component-config";
-import { MaterialItem } from "./MaterialItem";
+import { MaterialItem } from "../components/MaterialItem";
+
 export function Material() {
   const { componentConfig } = useComponentConfigStore();
 
   const components = useMemo(() => {
-    return Object.values(componentConfig)?.filter(
+    return Object.values(componentConfig).filter(
       (item) => item.name !== "Page"
     );
   }, [componentConfig]);
@@ -15,8 +16,8 @@ export function Material() {
       {components.map((item, index) => {
         return (
           <MaterialItem
-            desc={item.desc ?? ""}
             name={item.name}
+            desc={item.desc}
             key={item.name + index}
           />
         );
