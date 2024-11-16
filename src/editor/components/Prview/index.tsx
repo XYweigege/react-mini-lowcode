@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useComponentConfigStore } from "../../stores/component-config";
 import { Component, useComponetsStore } from "../../stores/components";
 import { message } from "antd";
@@ -8,6 +8,8 @@ import { ShowMessageConfig } from "../Setting/actions/ShowMessage";
 export function Preview() {
   const { components } = useComponetsStore();
   const { componentConfig } = useComponentConfigStore();
+  const componentRefs = useRef<Record<string, any>>({});
+
   function handleEvent(component: Component) {
     const props: Record<string, any> = {};
 
@@ -15,7 +17,7 @@ export function Preview() {
       const eventConfig = component.props[event.name];
 
       if (eventConfig) {
-        props[event.name] = () => {
+        props[event.name] = (...args: any[]) => {
           eventConfig?.actions?.forEach(
             (action: GoToLinkConfig | ShowMessageConfig) => {
               if (action.type === "goToLink") {
@@ -25,6 +27,25 @@ export function Preview() {
                   message.success(action.config.text);
                 } else if (action.config.type === "error") {
                   message.error(action.config.text);
+                }
+              } else if (action.type === "customJS") {
+                const func = new Function("context", "args", action.code);
+                func(
+                  {
+                    name: component.name,
+                    props: component.props,
+                    showMessage(content: string) {
+                      message.success(content);
+                    },
+                  },
+                  ...args
+                );
+              } else if (action.type === "componentMethod") {
+                const component =
+                  componentRefs.current[action.config.componentId];
+
+                if (component) {
+                  component[action.config.method]?.(...args);
                 }
               }
             }
@@ -50,6 +71,9 @@ export function Preview() {
           id: component.id,
           name: component.name,
           styles: component.styles,
+          ref: (ref: Record<string, any>) => {
+            componentRefs.current[component.id] = ref;
+          },
           ...config.defaultProps,
           ...component.props,
           ...handleEvent(component),
