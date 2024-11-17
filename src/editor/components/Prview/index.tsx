@@ -82,6 +82,28 @@ export function Preview() {
       );
     });
   }
+  /*
+[
+  {
+    "id": 1,
+    "name": "Page",
+    "props": {},
+    "desc": "页面",
+    "children": [
+      {
+        "id": 1731734128139,
+        "name": "Button",
+        "desc": "按钮",
+        "props": {
+          "type": "primary",
+          "text": "按钮"
+        },
+        "parentId": 1
+      }
+    ]
+  }
+]
+*/
 
   return <div>{renderComponents(components)}</div>;
 }
